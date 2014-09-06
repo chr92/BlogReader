@@ -176,12 +176,16 @@ public class MainListActivity extends ListActivity {
                 if (responseCode == HttpURLConnection.HTTP_OK) {
                     InputStream inputStream = connection.getInputStream();
                     Reader reader = new InputStreamReader(inputStream);
-                    int contentLength = connection.getContentLength();
-                    char[] charArray = new char[contentLength];
-                    reader.read(charArray);
-                    String responseData = new String(charArray);
+                    int nextCharacter; // read() returns an int, we cast it to char later
+                    String responseData = "";
+                    while (true) { // Infinite loop, can only be stopped by a "break" statement
+                        nextCharacter = reader.read(); // read() without parameters returns one character
+                        if (nextCharacter == -1) // A return value of -1 means that we reached the end
+                            break;
+                        responseData += (char) nextCharacter; // The += operator appends the character to the end of the string
+                    }
+                        jsonResponse = new JSONObject(responseData);
 
-                    jsonResponse = new JSONObject(responseData);
                 }
                 else {
                     Log.i(TAG, "Unsuccessful HTTP Response Code: "+ responseCode);
